@@ -27,8 +27,13 @@ async function connectToDatabase(uri: string | undefined) {
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
     if (req.method === 'DELETE') {
+        let admin_password = process.env.ADMIN_PASSWORD;
+        if (!admin_password) {
+            throw new Error('Please define the ADMIN_PASSWORD environment variable inside .env')
+        }
+
         const { password } = req.body
-        if (password !== "ff44f4d00355e63175f7d53a194ce2a4") {
+        if (password !== admin_password) {
             res.status(401).json({ message: 'Not authorized!' })
             return
         }

@@ -10,21 +10,20 @@ export default function Admin() {
 
     async function handleClearAllData(event: any) {
         event.preventDefault();
+        setDisabled(true);
 
-        if (password !== "ff44f4d00355e63175f7d53a194ce2a4") {
-            alert("Senha incorreta!")
-            return
+        try {
+            await axios.delete("/api/clearAllData", { data: { password } });
+            alert("Dados apagados com sucesso!");
+        } catch (e: unknown) {
+            if (axios.isAxiosError(e) && e.response && e.response.status === 401) {
+                alert("Você não tem permissão para apagar os dados!");
+            } else {
+                alert("Erro ao apagar os dados!");
+            }
+        } finally {
+            setDisabled(false);
         }
-
-
-        setDisabled(true)
-
-        const response = await axios.delete("/api/clearAllData", { data: { password } })
-
-        response.status === 401 ? alert("Você não tem permissão para apagar os dados!") : null;
-
-        response.status === 200 ? alert("Dados apagados com sucesso!") : alert("Erro ao apagar os dados!");
-        setDisabled(false)
     }
 
     return (
@@ -41,8 +40,8 @@ export default function Admin() {
                         onChange={e => setPassword(e.target.value)}
                         required
                     />
-                    <Button 
-                        variant="primary" 
+                    <Button
+                        variant="primary"
                         type="submit"
                         disabled={disabled}
                     >Limpar</Button>
@@ -50,4 +49,4 @@ export default function Admin() {
             </Form>
         </Container>
     );
-    }
+}
